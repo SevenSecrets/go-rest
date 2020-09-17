@@ -11,7 +11,7 @@ import (
 	"net/http"
 )
 
-func quoteGenerator() (string) {
+func quoteGenerator(author string) string {
 	jsonFile, err := os.Open("quotes.json")
 
 	if err != nil {
@@ -27,7 +27,7 @@ func quoteGenerator() (string) {
 	var res map[string]interface{}
 	json.Unmarshal([]byte(byt), &res)
 
-	quotes := res["quotes"].([]interface{})
+	quotes := res[author].([]interface{})
 	quote := quotes[rand.Intn(len(quotes))].(string)
 
 	return quote
@@ -35,10 +35,20 @@ func quoteGenerator() (string) {
 
 func main() {
 	r := gin.Default()
-	r.LoadHTMLGlob("templates/*")
 
-	r.GET("/", func(c *gin.Context) {
-		quote := quoteGenerator()
+	r.StaticFile("/", "./static/index.html")
+
+	r.GET("/perlman", func(c *gin.Context) {
+		quote := quoteGenerator("perlman")
+		var response struct {
+			Quote string
+		}
+		response.Quote = quote
+		c.JSON(http.StatusOK, response)
+	})
+
+	r.GET("/camatte", func(c *gin.Context) {
+		quote := quoteGenerator("camatte")
 		var response struct {
 			Quote string
 		}
@@ -49,5 +59,6 @@ func main() {
 	r.POST("/", func(c *gin.Context) {
 		fmt.Println("POST RECEIVED")
 	})
+
 	r.Run(":8080")
 }
