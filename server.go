@@ -1,19 +1,15 @@
 package main
 
 import (
-	// "context"
 	"fmt"
-	// "os"
 	"math/rand"
-	// "io/ioutil"
-	// "encoding/json"
 	"net/http"
 
 	"github.com/gin-gonic/gin"
 	"github.com/go-pg/pg/v10"
-	// "github.com/go-pg/pg/v10/orm"
 )
 
+// Quote is struct for pg package to refer to for database
 type Quote struct {
 	author string
 	quote string
