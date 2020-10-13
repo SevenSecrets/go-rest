@@ -1,45 +1,61 @@
 package main
 
 import (
-	"github.com/gin-gonic/gin"
-
+	// "context"
 	"fmt"
-	"os"
+	// "os"
 	"math/rand"
-	"io/ioutil"
-	"encoding/json"
+	// "io/ioutil"
+	// "encoding/json"
 	"net/http"
+
+	"github.com/gin-gonic/gin"
+	"github.com/go-pg/pg/v10"
+	// "github.com/go-pg/pg/v10/orm"
 )
 
-func quoteGenerator(author string) string {
-	jsonFile, err := os.Open("quotes.json")
+type Quote struct {
+	author string
+	quote string
+}
 
-	if err != nil {
-		fmt.Println(err)
-	}
+func (q Quote) String() string {
+	return fmt.Sprintf("Quote<%s %s>", q.author, q.quote)
+}
 
-	fmt.Println("successfully opened JSON file.")
-
-	defer jsonFile.Close()
-
-	byt, _ := ioutil.ReadAll(jsonFile)
-
-	var res map[string]interface{}
-	json.Unmarshal([]byte(byt), &res)
-
-	quotes := res[author].([]interface{})
-	quote := quotes[rand.Intn(len(quotes))].(string)
-
+func quoteGenerator(quotes []string) string {
+	quote := quotes[rand.Intn(len(quotes))]
 	return quote
 }
 
 func main() {
+
+	db := pg.Connect(&pg.Options{
+		Addr: ":5432",
+		User: "postgres",
+		Password: "",
+		Database: "go-rest",
+	})
+	defer db.Close()
+
 	r := gin.Default()
 
 	r.StaticFile("/", "./static/index.html")
 
 	r.GET("/perlman", func(c *gin.Context) {
-		quote := quoteGenerator("perlman")
+
+		var quotes []string
+		
+		err := db.Model((*Quote)(nil)).
+		ColumnExpr("array_agg(quote)").
+		Where("author = ?", "Perlman").
+		Select(pg.Array(&quotes))
+		if err != nil {
+			panic(err)
+		}
+
+		quote := quoteGenerator(quotes)
+
 		var response struct {
 			Quote string
 		}
@@ -48,7 +64,18 @@ func main() {
 	})
 
 	r.GET("/camatte", func(c *gin.Context) {
-		quote := quoteGenerator("camatte")
+		var quotes []string
+		
+		err := db.Model((*Quote)(nil)).
+		ColumnExpr("array_agg(quote)").
+		Where("author = ?", "Camatte").
+		Select(pg.Array(&quotes))
+		if err != nil {
+			panic(err)
+		}
+
+		quote := quoteGenerator(quotes)
+
 		var response struct {
 			Quote string
 		}
