@@ -7,7 +7,7 @@ Currently spits out random quotes from a couple of authors. Uses a locally hoste
 Runs with ```run go ./server.go``` and serves on "/", "/perlman", and "/camatte" at the moment.
 
 
-Current plans: 
+### Current plans: 
   - split the queries into a separate method, to keep it a bit cleaner.
   - add a few more authors and quotes.
   - get to learning how to use environment variables in Go so I can use the password for the database properly.
