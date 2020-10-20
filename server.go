@@ -4,7 +4,9 @@ import (
 	"fmt"
 	"math/rand"
 	"net/http"
+	"os"
 
+	"github.com/joho/godotenv"
 	"github.com/gin-gonic/gin"
 	"github.com/go-pg/pg/v10"
 )
@@ -26,13 +28,20 @@ func quoteGenerator(quotes []string) string {
 
 func main() {
 
+	err := godotenv.Load()
+	if err != nil {
+		panic(err)
+	}
+
 	db := pg.Connect(&pg.Options{
 		Addr: ":5432",
 		User: "postgres",
-		Password: "",
+		Password: os.Getenv("GO_DATABASE_PASS"),
 		Database: "go-rest",
 	})
 	defer db.Close()
+
+	fmt.Println(os.Getenv("GO_DATABASE_PASS"))
 
 	r := gin.Default()
 
