@@ -16,3 +16,4 @@ Runs with ```run go ./server.go``` and serves on "/", "/perlman", and "/camatte"
   - add a few more authors and quotes.
   - why do I have a static html page being served on index? well, it was originally for me learning to use gin but now I'll have to find something else to put on "/".
   - see about making it possible to see all of the quotes together by author, and then select individual ones.
+  - this is also probably going to be what I use to teach myself how to use AWS properly, and NGINX.
